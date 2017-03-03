@@ -34,6 +34,35 @@
         }
     }
 
+    function resolver() {
+        var i;
+        for (i = 0; i < tabuleiro.length; i++) { // Vira todas as cartas.
+            visualizarCarta(i, i);
+        }
+
+        if(valor >= 100 || valor <= -100){
+            document.getElementById("ponto").style.width = "30px";
+        }
+
+        else if(valor < 100 && valor >= 10){
+            document.getElementById("ponto").style.width = "18px";
+        }
+
+        else{
+            document.getElementById("ponto").style.width = "10px";
+        }
+
+        document.getElementById("msg").value = numCliques / 2;
+        $('.modal-header').addClass('bg-info');
+        $('.modal-header').html("<button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button><h4 style='color: dodgerblue'>Tente novamente sei que vai conseguir! <img src='imagens/triste.png' alt=''><h4/>");
+
+        $(".btn-primary").click();
+        setTimeout("novoJogo();", 3000);
+        valor = 0;
+        acertos = 0;
+        numCliques = 0;
+    }
+
     // *** Verifica qual o botão clicado de uma jogada. Se for o segundo, verifica se acertou ou errou. ***
     function verificaJogada(indice) {
         if (tabuleiroBool[indice] == 0) {
@@ -48,30 +77,60 @@
             } else if (( tabuleiro[indice] % 12 ) == ( tabuleiro[indiceCartaAnterior] % 12 )) { // Acertou.
                 acertos++;
                 valor += 20;
+
                 document.getElementById("ponto").value = valor;
 
                 if (acertos == tabuleiro.length / 2) {
-                    document.getElementById("msg").value = "*** Fim de Jogo! *** Você errou " + ( ( numCliques / 2 ) - acertos ) + " vez(es).";
-                    alert("Parabéns, você concluiu o jogo com a pontuação de: " + valor);
+                    document.getElementById("msg").value = numCliques / 2;
+                    if(valor >= 100 || valor <= -100){
+                        document.getElementById("ponto").style.width = "30px";
+                    }
+
+                    else if(valor < 100 && valor >= 10){
+                        document.getElementById("ponto").style.width = "18px";
+                    }
+
+                    else{
+                        document.getElementById("ponto").style.width = "10px";
+                    }
+
+                    if(valor < 0){
+                        $('.modal-header').addClass('bg-danger');
+                        $('.modal-header').html("<button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button><h4 style='color: red'>Você não foi tão bem, tente de novo sei que vai conseguir! <img src='imagens/triste.png' alt=''><h4/>");
+                    }
+
+                    else if(valor >= 0 && valor < 30){
+                        $('.modal-header').addClass('bg-warning');
+                        $('.modal-header').html("<button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button><h4 style='color:darkgoldenrod;'>Você não foi bem, mas pode ser melhor <img src='imagens/ehNeh.png' alt=''><h4/>");
+                    }
+
+                    else if(valor > 30){
+                        $('.modal-header').addClass('bg-sucess');
+                        $('.modal-header').html("<button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button><h4 style='color: green'>Você foi muito bem, Parabéns! <img src='imagens/smiley.png' alt=''><h4/>");
+                    }
+
+                    $(".btn-primary").click();
+                    $("#novoJogo").click();
+                    valor = 0;
+                    acertos = 0;
+                    numCliques = 0;
                 }
             } else { // Errou.
                 cartaAtual = indice; // Passando o valor para a variável global pode-se usar 'setTimeout'
-                document.getElementById("msg").value = "ERROU!";
                 valor -= 10;
 
                 // Os procedimentos adotados abaixo permitem ao jogador visualizar a segunda
                 // carta clicada sem poder clicar em nenhuma outra enquanto as outras duas ainda
                 // estiverem visíveis.
                 trava(1);
-                setTimeout("trava( 0 );", 300);
+                setTimeout("trava( 0 );", 600);
 
-                setTimeout("esconderCarta( indiceCartaAnterior );", 300);
-                setTimeout("esconderCarta( cartaAtual );", 300);
-                setTimeout("document.getElementById( \"msg\" ).value = \"\";", 300);
+                setTimeout("esconderCarta( indiceCartaAnterior );", 600);
+                setTimeout("esconderCarta( cartaAtual );", 600);
+                setTimeout("document.getElementById( \"msg\" ).value = \"\";", 600);
                 document.getElementById("ponto").value = valor;
             }
         }
-
         return;
     }
 
@@ -89,6 +148,7 @@
 
     // *** Inicia um novo jogo ***
     function novoJogo() {
+        valor = 0;
         acertos = 0;
         numCliques = 0;
         indiceBotaoClicado = -1;
@@ -98,9 +158,6 @@
         }
 
         embaralhaTabuleiro();
-        document.getElementById("msg").value = "Novo jogo iniciado!";
-
-        return;
     }
 
     // *** Permite ou não que o jogador possa clicar nas cartas ***
@@ -115,55 +172,69 @@
                 tabuleiroBool[i] = tabuleiroBoolAux[i];
             }
         }
-
-        return;
     }
 </script>
 
 <body>
 <h2 align="center"><b>Memória CDF</b></h2>
 
-<table border="0" align="center">
-    <input disabled="disabled" type="text" id="ponto" size="1" value="0"/>
+<div class="container box">
+    <div id="botao">
+        <input class="btn btn-danger" type="button" value="Desistir" onclick="resolver();">
+    </div>
 
-    <tr>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 0 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 1 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 2 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 3 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 4 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 5 );" /></td>
-    </tr>
-    <tr>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 6 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 7 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 8 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 9 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 10 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 11 );" /></td>
-    </tr>
-    <tr>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 12 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 13 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 14 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 15 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 16 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 17 );" /></td>
-    </tr>
-    <tr>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 18 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 19 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 20 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 21 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 22 );" /></td>
-        <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 23 );" /></td>
-    </tr>
-</table>
+    <table id="table" border="0" align="center">
+        <tr>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 0 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 1 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 2 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 3 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 4 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 5 );" /></td>
+        </tr>
+        <tr>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 6 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 7 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 8 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 9 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 10 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 11 );" /></td>
+        </tr>
+        <tr>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 12 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 13 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 14 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 15 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 16 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 17 );" /></td>
+        </tr>
+        <tr>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 18 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 19 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 20 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 21 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 22 );" /></td>
+            <td><img class="carta" src="imagens/costas.jpg" name="campo" onclick="verificaJogada( 23 );" /></td>
+        </tr>
+    </table>
+</div>
+        <input style="display: none" id="novoJogo" type="button" value="" onclick="novoJogo();" />
 
-<center>
-    <input type="text" id="msg" size="45" />
+        <button style="display: none" type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Small modal</button>
 
-    <input type="button" value="Novo Jogo" onclick="novoJogo();" />
-    <center>
+        <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+
+                    </div>
+                    <div class="modal-body">
+                        <p style="text-align: center">Sua pontuação no jogo foi de <input readonly="true" style="border: 0;" type="text" id="ponto" value="0"/> pontos</p>
+                        <p style="text-align: center">Você realizou <input value="0" readonly="true" style="border: 0; width: 15px;" type="text" id="msg" /> jogadas </p>
+                    </div>
+
+            </div>
+        </div>
+
 </body>
 </html>

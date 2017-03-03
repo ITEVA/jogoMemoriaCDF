@@ -12,3 +12,37 @@
     -ms-transform: scale(1.1);
     transform: scale(1.1);
 }
+
+div#botao{
+    display: block;
+    width: 93%;
+}
+
+input.btn-danger{
+    float: right;
+}
+
+@media all and (max-width: 1200px){
+    .carta{
+        width: 145px;
+        height: 205px;
+    }
+    div#botao{
+        width: 95%;
+    }
+}
+
+@media all and (max-width: 992px){
+    div.box {
+        width: 780px;!important;
+    }
+
+    .carta {
+        width: 125px;
+        height: 180px;
+    }
+
+    div#botao{
+        width: 98.5%;
+    }
+}
